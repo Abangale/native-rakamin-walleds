@@ -1,16 +1,26 @@
+import { useNavigation } from "@react-navigation/native";
 import { useState } from "react";
-import { StyleSheet, Button, TextInput, Platform, TouchableOpacity, View, Text } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import {
+  StyleSheet,
+  Button,
+  TextInput,
+  Platform,
+  TouchableOpacity,
+  View,
+  Text,
+  SafeAreaView,
+} from "react-native";
 
 export default function FormComponent({ state }) {
   console.log("state nya adalah: ", state);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [phoneNumber, setPhoneNumber] = useState("");
-  const [notes, setNotes] = useState("");
+  const [avatarURI, setAvatarURI] = useState("");
   const [isSelected, setSelection] = useState(false);
   const [errors, setErrors] = useState({});
+
+  const navigation = useNavigation();
 
   const validate = () => {
     const validEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -25,71 +35,119 @@ export default function FormComponent({ state }) {
 
   return (
     <SafeAreaView style={{ paddingTop: Platform.OS === "android" ? 30 : 0 }}>
-      {state === "register" && (
+      {/* {state === "register" && (
         <TextInput
           style={styles.input}
-          placeholder="Enter your name"
+          placeholder="Fullname"
           value={name}
           onChangeText={(text) => setName(text)}
         />
-      )}
-      <TextInput
-        style={styles.input}
-        placeholder="Enter your email address"
-        value={email}
-        onChangeText={(text) => setEmail(text)}
-        autoCorrect={false}
-        autoCapitalize="none"
-      ></TextInput>
-      {errors.messageEmailError && <Text>{errors.messageEmailError}</Text>}
-      <TextInput
-        style={styles.input}
-        placeholder="Enter your password address"
-        value={password}
-        onChangeText={setPassword}
-        autoCorrect={false}
-        autoCapitalize="none"
-        secureTextEntry
-      ></TextInput>
-      {errors.messagePasswordError && (
-        <Text>{errors.messagePasswordError}</Text>
-      )}
-      <TextInput
-        style={styles.input}
-        placeholder="Enter your phone number"
-        value={phoneNumber}
-        onChangeText={setPhoneNumber}
-        autoCorrect={false}
-        inputMode="numeric"
-        autoCapitalize="none"
-      ></TextInput>
-      <TextInput
-        style={[styles.input]}
-        placeholder="Notes"
-        value={notes}
-        multiline={true}
-        numberOfLines={4}
-        onChangeText={setNotes}
-      ></TextInput>
-
-      <TouchableOpacity
-        style={styles.checkboxContainer}
-        onPress={() => setSelection(!isSelected)}
-      >
-        <View style={[styles.checkbox, isSelected && styles.checkedCheckbox]} />
-        <Text style={styles.label}>I agree to the terms and conditions</Text>
-      </TouchableOpacity>
-
-      <Text>Is CheckBox selected: {isSelected ? "👍" : "👎"}</Text>
-      <Button title="Submit" />
+      )} */}
 
       {state === "login" ? (
-        <Button title="Login" onPress={() => console.log("login")}></Button>
+        <>
+          <TextInput
+            style={styles.input}
+            placeholder="Email"
+            value={email}
+            onChangeText={(text) => setEmail(text)}
+            autoCorrect={false}
+            autoCapitalize="none"
+          ></TextInput>
+          {errors.messageEmailError && <Text>{errors.messageEmailError}</Text>}
+          <TextInput
+            style={styles.input}
+            placeholder="Password"
+            value={password}
+            onChangeText={setPassword}
+            autoCorrect={false}
+            autoCapitalize="none"
+            secureTextEntry
+          ></TextInput>
+          {errors.messagePasswordError && (
+            <Text>{errors.messagePasswordError}</Text>
+          )}
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => {
+              console.log("login");
+              navigation.navigate("Home");
+            }}
+          >
+            <Text style={styles.buttonText}>Login</Text>
+          </TouchableOpacity>
+          <View style={{ paddingHorizontal: 10, flexDirection: "row" }}>
+            <Text>Don't have account?</Text>
+            <Text
+              style={styles.hereText}
+              onPress={() => navigation.navigate("Register")}
+            >
+              Register here
+            </Text>
+          </View>
+        </>
       ) : (
-        <Button
-          title="Register"
-          onPress={() => console.log("register")}
-        ></Button>
+        <>
+          <TextInput
+            style={styles.input}
+            placeholder="Fullname"
+            value={name}
+            onChangeText={(text) => setName(text)}
+            autoCorrect={false}
+          ></TextInput>
+          <TextInput
+            style={styles.input}
+            placeholder="Email"
+            value={email}
+            onChangeText={(text) => setEmail(text)}
+            autoCorrect={false}
+            autoCapitalize="none"
+          ></TextInput>
+          {errors.messageEmailError && <Text>{errors.messageEmailError}</Text>}
+          <TextInput
+            style={styles.input}
+            placeholder="Password"
+            value={password}
+            onChangeText={setPassword}
+            autoCorrect={false}
+            autoCapitalize="none"
+            secureTextEntry
+          ></TextInput>
+          {errors.messagePasswordError && (
+            <Text>{errors.messagePasswordError}</Text>
+          )}
+          <TextInput
+            style={styles.input}
+            placeholder="Avatar URI"
+            value={avatarURI}
+            onChangeText={(text) => setAvatarURI(text)}
+            autoCorrect={false}
+            autoCapitalize="none"
+          ></TextInput>
+          <TouchableOpacity
+            style={styles.checkboxContainer}
+            onPress={() => setSelection(!isSelected)}
+          >
+            <View
+              style={[styles.checkbox, isSelected && styles.checkedCheckbox]}
+            />
+            <Text style={styles.label}>
+              By signing up you agree to our Terms and condition
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => console.log("login")}
+          >
+            <Text style={styles.buttonText}>Register</Text>
+          </TouchableOpacity>
+          <View style={{ paddingHorizontal: 10, flexDirection: "row" }}>
+            <Text>Have an account?</Text>
+            <Text style={styles.hereText} onPress={() => navigation.goBack()}>
+              Login here
+            </Text>
+          </View>
+        </>
       )}
     </SafeAreaView>
   );
@@ -97,26 +155,49 @@ export default function FormComponent({ state }) {
 
 const styles = StyleSheet.create({
   input: {
-    borderWidth: 1,
-    borderColor: "black",
-    padding: 10,
+    padding: 15,
     margin: 10,
+    borderRadius: 10,
+    width: 320,
+    backgroundColor: "#FAFBFD",
+  },
+  button: {
+    padding: 15,
+    margin: 10,
+    borderRadius: 10,
+    width: 320,
+    backgroundColor: "#19918f",
+  },
+  buttonText: {
+    textAlign: "center",
+    color: "white",
+    fontWeight: "500",
+  },
+  hereText: {
+    marginLeft: 6,
+    color: "#19918f",
   },
   notesInput: {
     height: 200,
   },
   checkboxContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   checkbox: {
-    height: 24,
-    width: 24,
-    borderWidth: 2,
-    borderColor: '#000',
+    height: 16,
+    width: 16,
+    marginLeft: 10,
     marginRight: 8,
+    backgroundColor: "white",
+    borderRadius: 5,
   },
   checkedCheckbox: {
-    backgroundColor: '#4CAF50',
+    backgroundColor: "#4CAF50",
+  },
+  label: {
+    margin: 10,
+    marginTop: 15,
+    width: 280,
   },
 });

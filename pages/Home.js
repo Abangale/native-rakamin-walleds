@@ -1,14 +1,14 @@
+import { useNavigation } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
 import {
   StyleSheet,
   Text,
   View,
   Image,
-  SafeAreaView,
-  Platform,
-  Button,
   TouchableOpacity,
   ScrollView,
+  Platform,
+  SafeAreaView
 } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
 
@@ -44,9 +44,11 @@ export default function Home() {
     },
   ];
 
+  const navigation = useNavigation()
+
   return (
     <SafeAreaView
-      style={{ paddingTop: 30 }}
+      style={{ flex: 1, paddingTop: 30 }}
     >
       <StatusBar style="auto" />
       <View style={styles.container}>
@@ -164,7 +166,10 @@ export default function Home() {
                   backgroundColor: "#19918f",
                   borderRadius: 5,
                 }}
-                onPress={console.log("You press plus")}
+                onPress={() => {
+              console.log("Topup");
+              navigation.navigate("Topup");
+            }}
               >
                 <Icon name="add" size={20} color="#fff" />
               </TouchableOpacity>
@@ -175,7 +180,10 @@ export default function Home() {
                   backgroundColor: "#19918f",
                   borderRadius: 5,
                 }}
-                onPress={console.log("You press send")}
+                onPress={() => {
+                  console.log("Transfer");
+                  navigation.navigate("Transfer");
+                }}
               >
                 <Icon name="paper-plane-outline" size={18} color="#fff" />
               </TouchableOpacity>
