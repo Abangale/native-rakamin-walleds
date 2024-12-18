@@ -1,25 +1,51 @@
-import Form from "./Form";
-import Home from "./pages/Home";
-import Topup from "./Topup";
-import Transfer from "./Transfer";
-import Login from "./Login";
-import Register from "./Register";
-
+import React from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
+import { AuthProvider, useAuth } from "./context/authContext";
 
-const Stack = createStackNavigator()
+import Navbar from "./components/navbar";
+import Login from "./pages/login";
+import Register from "./pages/register";
+
+const Stack = createStackNavigator();
+
+function AppNavigator() {
+  const { user } = useAuth();
+
+  return (
+    <Stack.Navigator initialRouteName={user ? "Navbar" : "Login"}>
+      {user ? (
+        <>
+          <Stack.Screen
+            name="Navbar"
+            component={Navbar}
+            options={{ headerShown: false }}
+          />
+        </>
+      ) : (
+        <>
+          <Stack.Screen
+            name="Login"
+            component={Login}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen
+            name="Register"
+            component={Register}
+            options={{ headerShown: false }}
+          />
+        </>
+      )}
+    </Stack.Navigator>
+  );
+}
 
 export default function App() {
   return (
-    <NavigationContainer>
-      <Stack.Navigator initialRouteName="Login">
-        <Stack.Screen name="Home" component={Home} options={{headerShown: false}} />
-        <Stack.Screen name="Login" component={Login} options={{headerShown: false}} />
-        <Stack.Screen name="Register" component={Register} options={{headerShown: false}} />
-        <Stack.Screen name="Topup" component={Topup} options={{headerShown: false}} />
-        <Stack.Screen name="Transfer" component={Transfer} options={{headerShown: false}} />
-      </Stack.Navigator>
-    </NavigationContainer>
+    <AuthProvider>
+      <NavigationContainer>
+        <AppNavigator />
+      </NavigationContainer>
+    </AuthProvider>
   );
 }

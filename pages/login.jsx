@@ -1,12 +1,12 @@
 import { Image, Text, View, SafeAreaView, StyleSheet } from "react-native";
-import FormComponent from "./Form";
+import FormComponent from "../components/form";
 
 export default function Login() {
   return (
     <SafeAreaView style={{ flex: 1, paddingHorizontal: 20 }}>
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
         <Image
-          source={require("./assets/wallet.png")}
+          source={require("../assets/wallet.png")}
           style={{ width: 250, height: 60 }}
         />
         <FormComponent state="login"></FormComponent>

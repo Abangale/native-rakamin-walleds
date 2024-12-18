@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
 import {
@@ -6,50 +7,61 @@ import {
   View,
   Image,
   TouchableOpacity,
-  ScrollView,
-  Platform,
-  SafeAreaView
+  SafeAreaView,
 } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
+import ModalPop from "../components/modalpop";
+import { getProfile } from "../api/restApi";
+import TableTransaction from "../components/table";
+
+const formatBalance = (balance) => {
+  const formatter = new Intl.NumberFormat("id-ID", {
+    style: "currency",
+    currency: "IDR",
+    minimumFractionDigits: 0, // No decimal places
+  });
+
+  return formatter.format(balance);
+};
+
+const BalanceDisplay = ({ balance }) => {
+  return (
+    <Text
+      style={{
+        fontSize: 28,
+        fontWeight: "500",
+      }}
+    >
+      {formatBalance(balance)}
+    </Text>
+  );
+};
 
 export default function Home() {
-  const transactions = [
-    {
-      name: "Adityo Gizwanda",
-      type: "Transfer",
-      amount: "- 75.000,00",
-      date: "08 December 2024",
-      isPositive: false,
-    },
-    {
-      name: "Adityo Gizwanda",
-      type: "Topup",
-      amount: "+ 75.000,00",
-      date: "08 December 2024",
-      isPositive: true,
-    },
-    {
-      name: "Adityo Gizwanda",
-      type: "Transfer",
-      amount: "- 75.000,00",
-      date: "08 December 2024",
-      isPositive: false,
-    },
-    {
-      name: "Adityo Gizwanda",
-      type: "Transfer",
-      amount: "- 75.000,00",
-      date: "08 December 2024",
-      isPositive: false,
-    },
-  ];
+  const [modalVisible, setModalVisible] = useState(false);
+  const [profile, setProfile] = useState(null);
 
-  const navigation = useNavigation()
+  const toggleModal = () => {
+    setModalVisible(!modalVisible);
+  };
+
+  const fetchProfile = async () => {
+    try {
+      const data = await getProfile(); // Call the API function
+      setProfile(data); // Update the profile state with the API response
+    } catch (error) {
+      console.error("Failed to fetch profile:", error.message);
+    }
+  };
+
+  useEffect(() => {
+    fetchProfile(); // Fetch profile data when the component mounts
+  }, []);
+
+  const navigation = useNavigation();
 
   return (
-    <SafeAreaView
-      style={{ flex: 1, paddingTop: 30 }}
-    >
+    <SafeAreaView style={{ flex: 1, paddingTop: 30 }}>
       <StatusBar style="auto" />
       <View style={styles.container}>
         <View
@@ -71,10 +83,13 @@ export default function Home() {
             source={require("../assets/profile.jpg")}
             style={{ width: 46, height: 46, borderRadius: 100 }}
           />
-          <View style={{ marginLeft: 20 }}>
-            <Text style={{ fontWeight: "bold" }}>Aldra Kasyfil Aziz</Text>
+          <TouchableOpacity onPress={toggleModal} style={styles.triggerView}>
+            <Text style={styles.boldText}>
+              {profile ? profile.full_name : "Loading..."}
+            </Text>
             <Text>Personal Account</Text>
-          </View>
+          </TouchableOpacity>
+          <ModalPop modalVisible={modalVisible} toggleModal={toggleModal} />
           <View style={{ flex: 1 }}></View>
           <Image
             source={require("../assets/light.png")}
@@ -93,7 +108,7 @@ export default function Home() {
               }}
             >
               <Text style={{ fontWeight: "bold", fontSize: 24 }}>
-                Good Morning, Aldra
+                Good Morning, {profile ? profile.full_name : "Loading..."}
               </Text>
               <Text style={{ marginTop: 5, fontSize: 16 }}>
                 Check all your incoming and outgoing transactions here
@@ -117,7 +132,9 @@ export default function Home() {
             }}
           >
             <Text style={boxAccount.text}>Account No.</Text>
-            <Text style={boxAccount.text}>100899</Text>
+            <Text style={boxAccount.text}>
+              {profile ? profile.account_no : "Loading..."}
+            </Text>
           </View>
           <View
             style={{
@@ -149,7 +166,9 @@ export default function Home() {
                     fontWeight: "500",
                   }}
                 >
-                  Rp10.000.000
+                  <BalanceDisplay
+                    balance={profile ? profile.balance : "Loading..."}
+                  />
                 </Text>
                 <Icon
                   style={{ padding: 10 }}
@@ -167,9 +186,9 @@ export default function Home() {
                   borderRadius: 5,
                 }}
                 onPress={() => {
-              console.log("Topup");
-              navigation.navigate("Topup");
-            }}
+                  console.log("Topup");
+                  navigation.navigate("Topup");
+                }}
               >
                 <Icon name="add" size={20} color="#fff" />
               </TouchableOpacity>
@@ -191,44 +210,7 @@ export default function Home() {
           </View>
         </View>
         {/* Table */}
-        <ScrollView style={{ flex: 1 }}>
-          <View style={styles.transactionContainer}>
-            <Text
-              style={{
-                fontWeight: "bold",
-                fontSize: 20,
-                marginBottom: 10,
-                paddingBottom: 12,
-                borderBottomWidth: 1,
-                borderBottomColor: "#ddd",
-              }}
-            >
-              Transaction History
-            </Text>
-            {transactions.map((transaction, index) => (
-              <View key={index} style={styles.transactionRow}>
-                <View style={styles.circle} />
-                <View style={styles.transactionDetails}>
-                  <Text style={styles.transactionName}>{transaction.name}</Text>
-                  <Text style={styles.transactionType}>{transaction.type}</Text>
-                  <Text style={styles.transactionDate}>{transaction.date}</Text>
-                </View>
-                <View style={styles.transactionAmountContainer}>
-                  <Text
-                    style={[
-                      styles.transactionAmount,
-                      transaction.isPositive
-                        ? styles.positive
-                        : styles.negative,
-                    ]}
-                  >
-                    {transaction.amount}
-                  </Text>
-                </View>
-              </View>
-            ))}
-          </View>
-        </ScrollView>
+        <TableTransaction></TableTransaction>
       </View>
     </SafeAreaView>
   );
@@ -238,6 +220,12 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
+  },
+  triggerView: {
+    marginLeft: 20,
+  },
+  boldText: {
+    fontWeight: "bold",
   },
   transactionContainer: {
     padding: 20,
